@@ -161,8 +161,10 @@ const server = http.createServer((req, res) => {
           if (itemIndex !== -1) {
             const updatedItem = JSON.parse(updateBody);
             items[itemIndex].name = updatedItem.name;
+            items.push(updatedItem)
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(items[itemIndex]));
+            fs.writeFileSync("items.json", JSON.stringify(items));
           } else {
             res.writeHead(404, { "Content-Type": "text/plain" });
             res.end("Item not found");
@@ -175,7 +177,8 @@ const server = http.createServer((req, res) => {
         if (itemIndex !== -1) {
           const deletedItem = items.splice(itemIndex, 1);
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(deletedItem[0]));
+          res.end(JSON.stringify(deletedItem));
+          fs.writeFileSync("items.json", JSON.stringify(items));
         } else {
           res.writeHead(404, { "Content-Type": "text/plain" });
           res.end("Item not found");
