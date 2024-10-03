@@ -92,14 +92,17 @@ const hostName = "127.0.0.1";
 // In-memory data store
 const fileData = fs.readFileSync("items.json");
 let items = JSON.parse(fileData);
-let nextId = 1 ; // To generate unique IDs for items
+
+let other = items.length // counts the amount of ID's in the json file
+let nextId = other + 1 // To generate unique IDs for items
+
 
 // Create the server
 const server = http.createServer((req, res) => {
   const parsedUrl = url.parse(req.url, true);
 
-  // Serve index.html for the root URL
-  if (parsedUrl.pathname === "/data" && req.method === "GET") {
+  // Serve index.html for the root URL && to get data from json file
+  if (parsedUrl.pathname === "/items" && req.method === "GET") {
     fs.readFile("items.json", (err, data) => {
       if (err) {
         res.writeHead(500, { "Content-Type": "text/plain" });
@@ -112,8 +115,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   
-  // Handle CRUD operations
-  if (parsedUrl.pathname === "/data") {
+  // used to post new data 
+  if (parsedUrl.pathname === "/items") {
     switch (req.method) {
      case "POST":
         // Create a new item
@@ -135,6 +138,7 @@ const server = http.createServer((req, res) => {
         res.writeHead(405, { "Content-Type": "text/plain" });
         res.end("Method Not Allowed");
     };
+    //used for selecting specific ID's
   } else if (parsedUrl.pathname.startsWith("/items/")) {
     const id = parseInt(parsedUrl.pathname.split("/")[2]);
     const itemIndex = items.findIndex(item => item.id === id);
@@ -160,8 +164,23 @@ const server = http.createServer((req, res) => {
         req.on("end", () => {
           if (itemIndex !== -1) {
             const updatedItem = JSON.parse(updateBody);
+            //checks items index displays accordingly
+            if (items[itemIndex].name === updatedItem.name || updatedItem.name === "" || updatedItem.name == null){
+            items[itemIndex].name;
+          }else {
             items[itemIndex].name = updatedItem.name;
-            items.push(updatedItem)
+          }
+          if (items[itemIndex].surname === updatedItem.surname || updatedItem.surname === "" || updatedItem.surname == null){
+            items[itemIndex].surname;
+          }else {
+            items[itemIndex].surname = updatedItem.surname;
+          }
+          if (items[itemIndex].age === updatedItem.age || updatedItem.age == null){
+            items[itemIndex].age;
+          }else {
+            items[itemIndex].age = updatedItem.age;
+          }
+            // items.push(updatedItem)
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(items[itemIndex]));
             fs.writeFileSync("items.json", JSON.stringify(items));
@@ -199,5 +218,5 @@ const server = http.createServer((req, res) => {
 // Start the server
 const PORT = 3000;
 server.listen(PORT, hostName, () => {
-  console.log(`Server is running on http://${hostName}:${PORT}/data`);
+  console.log(`Server is running on http://${hostName}:${PORT}/items`);
 });
